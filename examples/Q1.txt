@@ -1,0 +1,5 @@
+let CheckSign number =
+    number < 0 -> 'Negative' | 'Positive'
+in
+
+Print(CheckSign (-10))

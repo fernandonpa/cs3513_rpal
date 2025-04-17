@@ -1,0 +1,12 @@
+
+let rec reverseNumber (num, rev) = 
+    num gr 0 -> reverseNumber (num/10, (rev*10 + num - (num/10)*10)) | rev
+        within
+        rec displayPalindromes (start, endVal) = 
+            endVal ls start -> '' |
+            reverseNumber (start, 0) eq start -> (displayPalindromes(start+1, endVal), print(' '), print(start)) |
+            displayPalindromes(start+1, endVal) 
+
+in
+
+displayPalindromes(5, 125)

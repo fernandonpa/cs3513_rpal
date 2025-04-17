@@ -1,0 +1,5 @@
+let CheckOddEven number =
+    number - (number / 2) * 2 eq 0 -> Print('Even') | Print('Odd')
+in
+
+CheckOddEven 12

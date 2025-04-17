@@ -1,0 +1,6 @@
+let rec SumOfFirstN (number) = 
+    number eq 0 -> 0 | number + SumOfFirstN(number - 1)
+
+in
+
+print(SumOfFirstN(100))

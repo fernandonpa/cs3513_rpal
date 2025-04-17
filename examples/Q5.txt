@@ -1,0 +1,6 @@
+let CheckPalindrome number =
+    number eq Reverse(number, 0) -> 'Palindrome' | 'Not a Palindrome'
+    where rec Reverse(num, reversed) =
+        num gr 0 -> Reverse(num / 10, (reversed * 10 + (num - (num / 10) * 10))) | reversed
+in
+Print(CheckPalindrome 1221)

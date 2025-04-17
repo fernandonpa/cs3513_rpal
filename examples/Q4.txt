@@ -1,0 +1,7 @@
+let CalculateFactorial number =
+    let rec FactorialHelper currentNum accumulator =
+        currentNum eq 0 -> accumulator
+        | FactorialHelper (currentNum - 1) (accumulator * currentNum)
+    in FactorialHelper number 1
+in
+Print(CalculateFactorial 4)
