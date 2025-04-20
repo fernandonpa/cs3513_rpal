@@ -1,0 +1,10 @@
+from enum import Enum
+
+class TokenType(Enum):
+    KEYWORD = "KEYWORD"
+    IDENTIFIER = "IDENTIFIER"
+    INTEGER = "INTEGER"
+    STRING = "STRING"
+    END_OF_TOKENS = "END_OF_TOKENS"
+    PUNCTUATION = "PUNCTUATION"
+    OPERATOR = "OPERATOR"
