@@ -1,5 +1,5 @@
-from typing import List, Optional
-from .syntax_node import Node, NodeFactory, StandardizationError
+from typing import List
+from .syntax_node import Node, NodeFactory
 from .tree_builder import AST
 
 
