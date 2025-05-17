@@ -40,6 +40,19 @@ class TokenType(Enum):
     ARROW = auto()
     EQUALS = auto()
     PIPE = auto()  # For the '|' operator
+    DOT = auto()
+    COLON = auto()
+    TILDE = auto()
+    DOLLAR = auto()
+    HASH = auto()
+    PERCENT = auto()
+    CARET = auto()
+    LEFT_BRACKET = auto()
+    RIGHT_BRACKET = auto()
+    LEFT_BRACE = auto()
+    RIGHT_BRACE = auto()
+    DOUBLE_QUOTE = auto()
+    QUESTION = auto()
     
     # Special symbols
     LEFT_PAREN = auto()
@@ -89,7 +102,23 @@ OPERATORS = {
     '&': TokenType.AMPERSAND,
     '->': TokenType.ARROW,
     '=': TokenType.EQUALS,
-    '|': TokenType.PIPE  # Added pipe operator
+    '|': TokenType.PIPE,
+    '>': TokenType.GR,    # Add these three lines
+    '<': TokenType.LS,
+    '!': TokenType.NOT,
+    '.': TokenType.DOT,
+    ':': TokenType.COLON,
+    '~': TokenType.TILDE,
+    '$': TokenType.DOLLAR,
+    '#': TokenType.HASH,
+    '%': TokenType.PERCENT,
+    '^': TokenType.CARET,
+    '[': TokenType.LEFT_BRACKET,
+    ']': TokenType.RIGHT_BRACKET,
+    '{': TokenType.LEFT_BRACE,
+    '}': TokenType.RIGHT_BRACE,
+    '"': TokenType.DOUBLE_QUOTE,
+    '?': TokenType.QUESTION,
 }
 
 # Mapping of punctuation to their token types
