@@ -1,37 +1,33 @@
-# cs3513_rpal
+# RPAL Language Compiler
 
-A Python‑based compiler toolchain for the RPAL (Right‑reference Parallel Applicative Language) programming language. This project includes a handwritten **lexer**, **parser**, **AST→ST normalizer**, and **CSE machine** evaluator.
-
----
+A Python-based compiler toolchain for the RPAL (Right-reference Parallel Applicative Language) programming language. This project includes a handwritten **lexer**, **parser**, **AST→ST normalizer**, and **CSE machine** evaluator.
 
 ## 📄 Project Description
 
-This repository provides an end‑to‑end implementation of an RPAL compiler in Python, without using external parser/lexer generators. It supports:
+This repository provides an end-to-end implementation of an RPAL compiler in Python, without using external parser/lexer generators. It supports:
 
-- **Lexical analysis**: tokenizes RPAL source.
-- **Parsing**: constructs an Abstract Syntax Tree (AST).
-- **Standardization**: transforms AST into a standardized tree (ST).
-- **Evaluation**: runs the ST on a CSE abstract machine to produce results.
-
-Use the `-ast` flag to print only the AST; otherwise, the result of evaluating the program will be printed.
-
----
+- **Lexical analysis**: Tokenizes RPAL source code into a stream of tokens
+- **Parsing**: Constructs an Abstract Syntax Tree (AST) using recursive descent parsing
+- **Standardization**: Transforms the AST into a standardized tree (ST) for execution
+- **Evaluation**: Runs the ST on a CSE (Control-Stack-Environment) abstract machine
 
 ## ⚙️ Setup Environment
 
 1. **Clone the repository**
 
    ```bash
-   git clone <your‑repo‑url> cs3513_rpal
+   git clone <your-repo-url> cs3513_rpal
    cd cs3513_rpal
    ```
 
-2. **Create a virtual environment** (using built‑in venv):
+2. **Create a virtual environment**
 
    ```bash
+   # On Windows
+   python -m venv .venv
+
+   # On macOS/Linux
    python3 -m venv .venv
-   // or after install pip virtualenv
-   //virtualenv .venv
    ```
 
 3. **Activate the environment**
@@ -40,85 +36,139 @@ Use the `-ast` flag to print only the AST; otherwise, the result of evaluating t
      ```bash
      source .venv/bin/activate
      ```
+   - On Windows (Command Prompt):
+     ```cmd
+     .\.venv\Scripts\activate
+     ```
    - On Windows (PowerShell):
      ```powershell
      .\.venv\Scripts\Activate.ps1
-        or .\.venv\Scripts\activate
      ```
 
-4. **Install development dependencies**
-
-   ```bash
-   pip install -r requirements-dev.txt
-   ```
-
-5. **Install project dependencies** (if you separate `requirements.txt`):
+4. **Install dependencies**
 
    ```bash
    pip install -r requirements.txt
    ```
 
----
+## 🚀 Usage
+
+### Using Command Line Interface
+
+Run your RPAL programs using the following commands:
+
+```bash
+# Execute an RPAL program
+python myrpal.py examples/program.txt
+
+# Print the abstract syntax tree (AST)
+python myrpal.py examples/program.txt -ast
+
+# Print the standardized abstract syntax tree (ST)
+python myrpal.py examples/program.txt -sast
+
+# Format output tuples as clean, sorted lists
+python myrpal.py examples/program.txt -pretty
+
+```
+
+### Using Makefile
+
+The project includes a Makefile that simplifies common tasks:
+
+```bash
+
+# Execute an RPAL program
+make run file=examples/program.txt
+
+# Print the abstract syntax tree
+make ast file=examples/program.txt
+
+# Print the standardized abstract syntax tree
+make sast file=examples/program.txt
+
+# Format output in a pretty, sorted manner
+make pretty file=examples/program.txt
+
+# Clean build artifacts
+make clean
+
+# Display help information
+make help
+
+```
+
+### Using Windows Subsystem for Linux (WSL)
+
+If you're using Windows, you can use WSL for a Linux-like experience:
+
+1. Navigate to your project directory:
+
+   ```
+   cd /mnt/c/Users/your-username/path/to/cs3513_rpal
+   ```
+
+2. Use the make commands as shown above.
 
 ## 📂 Project Structure
 
-````text
+```text
+
 cs3513_rpal/
 ├── src/
-│   ├── lexer/                         # Tokenizer implementation
-│   │   └── __init__.py                # Package init
-│   │   └── lexer.py and others        # Lexer class and token definitions
-│   ├── parser/                        # Recursive‑descent parser
-│   │   └── __init__.py                # Package init
-│   │   └── parser.py and others       # Parser class and AST builders
-│   ├── normalizer/                    # AST → Standardized Tree (ST)
-│   │   └── __init__.py                # Package init
-│   │   └── st.py and others           # Normalization logic
+│   ├── Lexer/                         # Tokenizer implementation
+│   │   ├── lexer.py                   # Main lexer logic
+│   │   ├── token.py                   # Token class definition
+│   │   └── token_types.py             # Token type definitions
+│   ├── Parser/                        # Recursive-descent parser
+│   │   ├── ast_node.py                # AST node implementation
+│   │   ├── node_types.py              # Node type definitions
+│   │   └── parser.py                  # Parser implementation
+│   ├── tree_normalizer/               # AST → Standardized Tree (ST)
+│   │   ├── normalizer.py              # Tree standardization logic
+│   │   ├── syntax_node.py             # Syntax node definitions
+│   │   └── tree_factory.py            # Factory for tree creation
 │   ├── cse_machine/                   # CSE abstract machine evaluator
-│   │   └── __init__.py                # Package init
-│   │   └── cse_machine.py and others  # Machine implementation
-│   └── myrpal.py                      # Entry point / CLI wrapper
-├── tests/                             # Unit tests (pytest)
-│   ├── test_lexer.py
-│   ├── test_parser.py
-│   ├── test_ast_st.py
-│   └── test_cse_machine.py
-├── examples/            # Sample RPAL programs
-├── Makefile             # Build/test/run tasks
-├── README.md
-├── .gitignore
-├── reports/
-├── requirements.txt
-└── docs/
+│   │   ├── factory.py                 # Factory for CSE machine creation
+│   │   ├── machine.py                 # CSE machine implementation
+│   │   └── nodes/                     # Node types for CSE machine
+├── examples/                          # Sample RPAL programs
+├── myrpal.py                          # Entry point CLI wrapper
+├── Makefile                           # Build/run tasks
+└── README.md                          # Project documentation
+
+```
+
+## 🧪 Sample Programs
+
+The examples directory contains several RPAL programs that demonstrate the language features:
+
+- **Q1.txt**: Simple arithmetic operations
+- **Q3.txt**: Fibonacci sequence generator
+- And more...
+
+## 🔍 Output Formats
+
+The compiler supports various output formats:
+
+- **Default**: Raw execution result
+- **Pretty (-pretty)**: Formatted output - especially useful for numeric sequences and tuples
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request with improvements or bug fixes.
+
+## 📝 License
+
+This project is open-source and available under the MIT License.
+
+## 📚 RPAL Language Resources
+
+For more information about the RPAL language syntax and semantics, consult the following resources:
+
+- [RPAL Language Reference](https://rpal-compiler.com) (placeholder)
+- [CS3513 Programming Languages Course Materials](https://cs3513.com) (placeholder)
 
 ---
 
-## 🚀 Getting Started
-
-- **Run a sample RPAL program**:
-
-  ```bash
-  make run FILE=examples/sample.rpl
-````
-
-- **Print the AST**:
-
-  ```bash
-  make ast FILE=examples/sample.rpl
-  ```
-
-- **Run all tests**:
-
-  ```bash
-  make test
-  ```
-
-- **Clean build artifacts**:
-
-  ```bash
-  make clean
-  ```
-
----
-
-> _This is an initial README. More details—such as detailed usage, contribution guidelines, and examples—will be added as the project evolves._
+> This project was developed as part of the CS3513 Programming Languages course.
