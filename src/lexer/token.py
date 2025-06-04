@@ -1,60 +1,43 @@
 from .token_types import TokenType
-from .lexer_error import InvalidTokenError
 
-class Token:
-    """
-    Class representing a token in the RPAL language
+class MyToken:
+    """Represents a lexical token in the RPAL language.
+    
+    A token is the smallest unit of meaning in the language, produced during 
+    lexical analysis (scanning). Each token has a type and a value.
     
     Attributes:
-        type (TokenType): The type of token
-        value (str): The string value of the token
-        line (int): Line number where the token appears
-        column (int): Column number where the token starts
+        type (TokenType): The category of this token (keyword, identifier, etc.)
+        value (str): The actual text or value of the token
     """
     
-    def __init__(self, token_type, value, line=1, column=1):
-        """
-        Initialize a new Token
+    def __init__(self, token_type, value):
+        """Initialize a new token with a type and value.
         
         Args:
-            token_type (TokenType): The type of token
-            value (str): The string value of the token
-            line (int, optional): Line number where the token appears. Defaults to 1.
-            column (int, optional): Column number where the token starts. Defaults to 1.
+            token_type (TokenType): The category of this token
+            value: The actual text or value of the token
             
         Raises:
-            InvalidTokenError: If token_type is not a valid TokenType
+            ValueError: If token_type is not a valid TokenType enum value
         """
         if not isinstance(token_type, TokenType):
-            raise InvalidTokenError(f"Invalid token type: {token_type}")
+            raise ValueError("token_type must be an instance of TokenType enum")
+        self.type = token_type  # Store the token's category (e.g., KEYWORD, IDENTIFIER)
+        self.value = value  # Store the actual text or value (e.g., "let", "x", "123")
+
+    def get_type(self):
+        """Get the token's type.
         
-        self.type = token_type
-        self.value = value
-        self.line = line
-        self.column = column
-    
-    def __str__(self):
-        """String representation of the token"""
-        return f"Token({self.type.name}, '{self.value}', line={self.line}, col={self.column})"
-    
-    def __repr__(self):
-        """Formal string representation of the token"""
-        return self.__str__()
-    
-    def __eq__(self, other):
-        """
-        Check if two tokens are equal
-        
-        Args:
-            other (Token): Another token to compare with
-            
         Returns:
-            bool: True if tokens are equal, False otherwise
+            TokenType: The category of this token
         """
-        if not isinstance(other, Token):
-            return False
-            
-        return (self.type == other.type and 
-                self.value == other.value and 
-                self.line == other.line and 
-                self.column == other.column)
+        return self.type
+
+    def get_value(self):
+        """Get the token's value.
+        
+        Returns:
+            The actual text or value of the token
+        """
+        return self.value

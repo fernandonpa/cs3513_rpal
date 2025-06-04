@@ -1,197 +1,241 @@
-from .nodes import *
+from .nodes.symbol import Symbol
+from .nodes.rand import Rand
+from .nodes.rator import Rator
+from .nodes.b import B
+from .nodes.beta import Beta
+from .nodes.bool import Bool
+from .nodes.delta import Delta
+from .nodes.dummy import Dummy
+from .nodes.e import E
+from .nodes.bop import Bop
+from .nodes.err import Err
+from .nodes.eta import Eta
+from .nodes.gamma import Gamma
+from .nodes.id import Id
+from .nodes.int import Int
+from .nodes.lmbda import Lambda
+from .nodes.tau import Tau
+from .nodes.tup import Tup
+from .nodes.uop import Uop
+from .nodes.ystar import Ystar
+from .nodes.str import Str
 from .machine import CSEMachine
 
-class CSEFactory:
-    """Factory class for creating CSE machine components."""
+class CSEMachineFactory:
+    """Factory for creating CSE machine components from the AST.
+    
+    This class transforms an abstract syntax tree (AST) into the standardized
+    control structure needed by the CSE machine. It handles the conversion of
+    AST nodes into appropriate CSE machine symbols and creates the initial
+    control, stack, and environment structures.
+    
+    The standardization process transforms the AST into a structure that
+    can be directly executed by the CSE machine, handling scoping rules,
+    environment creation, and function closures.
+    
+    Attributes:
+        e0 (E): The base environment (environment 0)
+        i (int): Counter for generating unique lambda indices
+        j (int): Counter for generating unique delta indices
+    """
     
     def __init__(self):
-        """Initialize the CSE factory."""
-        # Create the initial environment
-        self.initial_env = Environment(0)
-        # Counters for unique indices
-        self.lambda_counter = 1
-        self.delta_counter = 0
-    
-    def create_symbol(self, node):
-        """Create a symbol from a node in the standardized tree.
+        """Initialize a new CSE machine factory.
+        
+        Creates a base environment (e0) and initializes counters for 
+        generating unique indices for lambdas and deltas during the
+        standardization process.
+        """
+        self.e0 = E(0)         # Create the base environment
+        self.i = 1             # Lambda index counter (starts at 1)
+        self.j = 0             # Delta index counter (starts at 0)
+
+    def get_symbol(self, node):
+        """Convert an AST node into a CSE machine symbol.
+        
+        This method maps AST nodes to their corresponding CSE machine symbols
+        based on node type and data.
         
         Args:
-            node: A node from the standardized tree
+            node: AST node to convert
             
         Returns:
-            The corresponding symbol for the CSE machine
+            Symbol: The CSE machine symbol corresponding to the AST node
         """
         data = node.get_data()
         
-        # Handle unary operators
+        # Handle operators
         if data in ("not", "neg"):
-            return UnaryOperator(data)
-            
-        # Handle binary operators
+            return Uop(data)  # Unary operator symbol
         elif data in ("+", "-", "*", "/", "**", "&", "or", "eq", "ne", "ls", "le", "gr", "ge", "aug"):
-            return BinaryOperator(data)
-            
-        # Handle special symbols
+            return Bop(data)  # Binary operator symbol
         elif data == "gamma":
-            return Gamma()
+            return Gamma()  # Gamma symbol
         elif data == "tau":
-            return Tau(len(node.get_children()))
+            return Tau(len(node.get_children()))  # Tau symbol with the number of children
         elif data == "<Y*>":
-            return Ystar()
-            
-        # Handle literals and identifiers
+            return Ystar()  # Y* symbol
         else:
+            # Handle literals and identifiers
             if data.startswith("<IDENTIFIER:"):
-                return Identifier(data[12:-1])
+                return Id(data[12:-1])  # Identifier symbol
             elif data.startswith("<INTEGER:"):
-                return IntegerValue(data[9:-1])
+                return Int(data[9:-1])  # Integer symbol
             elif data.startswith("<STRING:"):
-                return StringValue(data[9:-2])
+                return Str(data[9:-2])  # String symbol
             elif data.startswith("<NIL"):
-                return Tuple()
+                return Tup()  # Empty tuple symbol
             elif data.startswith("<TRUE_VALUE:t"):
-                return BoolValue("true")
+                return Bool("true")  # Boolean true symbol
             elif data.startswith("<TRUE_VALUE:f"):
-                return BoolValue("false")
+                return Bool("false")  # Boolean false symbol
             elif data.startswith("<dummy>"):
-                return DummyValue()
+                return Dummy()  # Dummy symbol
             else:
-                # For unrecognized nodes, log the error and return ErrorSymbol
-                print(f"Error: Unrecognized node: {data}")
-                return ErrorSymbol(f"Unrecognized: {data}")
-    
-    def create_control_structure(self, node):
-        """Create a control structure (B) from a node.
+                print("Err node:", data)
+                return Err()  # Error symbol for unrecognized nodes
+
+    def get_b(self, node):
+        """Create a B (base environment) node from an AST node.
         
         Args:
-            node: A node representing a condition
+            node: AST node to convert
             
         Returns:
-            A ControlStructure object with instructions
+            B: A base environment node containing the symbols from the AST node
         """
-        control = ControlStructure()
-        control.instructions = self.traverse_tree_preorder(node)
-        return control
-    
-    def create_lambda(self, node):
-        """Create a lambda from a node.
+        b = B()
+        b.symbols = self.get_pre_order_traverse(node)
+        return b
+
+    def get_lambda(self, node):
+        """Create a Lambda node from an AST node.
+        
+        This handles the conversion of lambda abstractions in the AST to
+        Lambda nodes in the CSE machine, setting up parameter identifiers
+        and the function body as a delta.
         
         Args:
-            node: A lambda node from the standardized tree
+            node: AST lambda node to convert
             
         Returns:
-            A Lambda object
+            Lambda: A lambda node representing the function abstraction
         """
-        lambda_obj = Lambda(self.lambda_counter)
-        self.lambda_counter += 1
+        lambda_expr = Lambda(self.i)  # Create new lambda with unique index
+        self.i += 1
         
-        # Set the body (delta)
-        lambda_obj.set_body(self.create_delta(node.get_children()[1]))
+        # Set the function body as a delta
+        lambda_expr.set_delta(self.get_delta(node.get_children()[1]))
         
-        # Handle parameters (can be a single identifier or a comma-separated list)
-        param_node = node.get_children()[0]
-        
-        if param_node.get_data() == ",":
-            # Multiple parameters
-            for identifier in param_node.get_children():
-                lambda_obj.parameters.append(Identifier(identifier.get_data()[12:-1]))
+        # Handle parameter identifiers
+        if node.get_children()[0].get_data() == ",":
+            # Multiple parameters (comma-separated)
+            for identifier in node.get_children()[0].get_children():
+                lambda_expr.identifiers.append(Id(identifier.get_data()[12:-1]))
         else:
             # Single parameter
-            lambda_obj.parameters.append(Identifier(param_node.get_data()[12:-1]))
-            
-        return lambda_obj
-    
-    def traverse_tree_preorder(self, node):
-        """Traverse a tree in pre-order and convert nodes to symbols.
+            lambda_expr.identifiers.append(Id(node.get_children()[0].get_data()[12:-1]))
+        
+        return lambda_expr
+
+    def get_pre_order_traverse(self, node):
+        """Convert an AST node and its children to CSE machine symbols.
+        
+        This performs a pre-order traversal of the AST, converting each node
+        to its corresponding CSE machine symbol.
         
         Args:
-            node: The root node to traverse
+            node: AST node to traverse
             
         Returns:
-            A list of symbols in pre-order traversal order
+            list: List of CSE machine symbols corresponding to the AST
         """
         symbols = []
         
-        # Handle lambda nodes specially
         if node.get_data() == "lambda":
-            symbols.append(self.create_lambda(node))
-        
-        # Handle conditionals specially
-        elif node.get_data() == "->":
-            # Add the true and false branches as deltas
-            symbols.append(self.create_delta(node.get_children()[1]))
-            symbols.append(self.create_delta(node.get_children()[2]))
-            # Add beta for conditional branching
-            symbols.append(Beta())
-            # Add control structure for the condition
-            symbols.append(self.create_control_structure(node.get_children()[0]))
-        
-        # Handle all other nodes
-        else:
-            # Add the current node as a symbol
-            symbols.append(self.create_symbol(node))
+            # Handle lambda expressions
+            symbols.append(self.get_lambda(node))
             
-            # Recursively add all children
+        elif node.get_data() == "->":
+            # Handle conditional expressions (if-then-else)
+            symbols.append(self.get_delta(node.get_children()[1]))  # 'then' branch
+            symbols.append(self.get_delta(node.get_children()[2]))  # 'else' branch
+            symbols.append(Beta())  # Conditional selector
+            symbols.append(self.get_b(node.get_children()[0]))  # Condition
+            
+        else:
+            # Handle regular nodes
+            symbols.append(self.get_symbol(node))
             for child in node.get_children():
-                symbols.extend(self.traverse_tree_preorder(child))
+                symbols.extend(self.get_pre_order_traverse(child))
                 
         return symbols
-    
-    def create_delta(self, node):
-        """Create a delta (instruction sequence) from a node.
+
+    def get_delta(self, node):
+        """Create a Delta node from an AST node.
+        
+        Delta nodes mark environment boundaries in the CSE machine and
+        contain the code to execute within that environment.
         
         Args:
-            node: A node from the standardized tree
+            node: AST node to convert
             
         Returns:
-            A Delta object containing instructions
+            Delta: A delta node containing the symbols from the AST node
         """
-        delta = Delta(self.delta_counter)
-        self.delta_counter += 1
-        
-        # Set the instructions by traversing the subtree
-        delta.instructions = self.traverse_tree_preorder(node)
-        
+        delta = Delta(self.j)  # Create new delta with unique index
+        self.j += 1
+        delta.symbols = self.get_pre_order_traverse(node)
         return delta
-    
-    def create_control_stack(self, ast):
-        """Create the initial control stack for the CSE machine.
+
+    def get_control(self, ast):
+        """Create the initial control structure for the CSE machine.
+        
+        The control structure contains the base environment and the
+        standardized program represented as a delta.
         
         Args:
-            ast: The abstract syntax tree (standardized)
+            ast: The abstract syntax tree to convert
             
         Returns:
-            A list containing the initial environment and delta
+            list: The initial control structure for the CSE machine
         """
-        return [self.initial_env, self.create_delta(ast.get_root())]
-    
-    def create_value_stack(self):
-        """Create the initial value stack for the CSE machine.
+        control = [self.e0, self.get_delta(ast.get_root())]
+        return control
+
+    def get_stack(self):
+        """Create the initial stack for the CSE machine.
+        
+        The initial stack contains only the base environment.
         
         Returns:
-            A list containing the initial environment
+            list: The initial stack for the CSE machine
         """
-        return [self.initial_env]
-    
-    def create_environment_stack(self):
-        """Create the initial environment stack for the CSE machine.
+        return [self.e0]
+
+    def get_environment(self):
+        """Create the initial environment for the CSE machine.
+        
+        The initial environment contains only the base environment.
         
         Returns:
-            A list containing the initial environment
+            list: The initial environment for the CSE machine
         """
-        return [self.initial_env]
-    
-    def create_cse_machine(self, ast):
-        """Create a complete CSE machine from a standardized tree.
+        return [self.e0]
+
+    def get_cse_machine(self, ast):
+        """Create a complete CSE machine from an abstract syntax tree.
+        
+        This method standardizes the AST and creates a CSE machine with
+        the appropriate control, stack, and environment structures.
         
         Args:
-            ast: The abstract syntax tree (standardized)
+            ast: The abstract syntax tree to execute
             
         Returns:
-            A CSEMachine initialized with control, value, and environment stacks
+            CSEMachine: A fully initialized CSE machine ready to execute the program
         """
-        control_stack = self.create_control_stack(ast)
-        value_stack = self.create_value_stack()
-        env_stack = self.create_environment_stack()
-        
-        return CSEMachine(control_stack, value_stack, env_stack)
+        control = self.get_control(ast)
+        stack = self.get_stack()
+        environment = self.get_environment()
+        return CSEMachine(control, stack, environment)

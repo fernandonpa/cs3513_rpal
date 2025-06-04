@@ -1,74 +1,66 @@
-from typing import List
-from .syntax_node import Node, NodeFactory
+"""
+This module defines the ASTFactory class for building an Abstract Syntax Tree (AST) from raw data.
+"""
+
+from .syntax_node import Node
 from .tree_builder import AST
 
-
 class ASTFactory:
-    """Factory class for creating Abstract Syntax Trees from parsed data."""
-    
-    @staticmethod
-    def get_abstract_syntax_tree(data: List[str]) -> AST:
+    """
+    Factory class for building an Abstract Syntax Tree (AST) from raw data.
+    """
+
+    def __init__(self):
         """
-        Create an AST from a list of strings representing nodes with depth.
-        
+        Initialize an ASTFactory instance.
+        """
+        pass
+
+    def get_abstract_syntax_tree(self, data):
+        """
+        Build an Abstract Syntax Tree (AST) from raw data.
+
         Args:
-            data: List of strings where each string represents a node with its depth
-                 (e.g., "...<ID:foo>" where dots represent depth)
-                 
+            data (list[str]): The raw data representing the tree structure.
+
         Returns:
-            An AST with the constructed tree
-            
-        Raises:
-            ASTConstructionError: If there's an error in constructing the AST
+            AST: The constructed Abstract Syntax Tree.
         """
-        if not data:
-            raise ASTConstructionError("Cannot create AST from empty data")
-            
-        try:
-            # Create the root node
-            root = NodeFactory.create(data[0], 0)
-            previous_node = root
-            current_depth = 0
-            
-            for s in data[1:]:
-                # Calculate depth based on leading dots
-                i = 0
-                d = 0
-                while i < len(s) and s[i] == '.':
-                    d += 1
-                    i += 1
-                
-                # Create current node
-                node_data = s[i:]
-                current_node = NodeFactory.create(node_data, d)
-                
-                # Determine where to add this node in the tree
-                if current_depth < d:
-                    # This is a child of the previous node
-                    previous_node.children.append(current_node)
-                    current_node.set_parent(previous_node)
-                else:
-                    # Need to find the right parent
-                    parent_node = previous_node
-                    while parent_node.get_depth() != d - 1:
-                        parent_node = parent_node.get_parent()
-                        if parent_node is None:
-                            raise ASTConstructionError(f"Invalid tree structure at node: {node_data}")
-                    
-                    parent_node.children.append(current_node)
-                    current_node.set_parent(parent_node)
-                
-                previous_node = current_node
-                current_depth = d
-                
-            return AST(root)
-            
-        except Exception as e:
-            if isinstance(e, ASTConstructionError):
-                raise
-            raise ASTConstructionError(f"Error constructing AST: {str(e)}")
+        root = self._create_node(data[0], 0)
+        previous_node = root
+        current_depth = 0
 
+        for line in data[1:]:
+            depth = line.count(".")
+            node_data = line[depth:]
+            current_node = self._create_node(node_data, depth)
 
-class ASTConstructionError(Exception):
-    """Exception raised for errors during AST construction."""
-    pass
+            if depth > current_depth:
+                previous_node.get_children().append(current_node)
+                current_node.set_parent(previous_node)
+            else:
+                while previous_node.get_depth() != depth:
+                    previous_node = previous_node.get_parent()
+                previous_node.get_parent().get_children().append(current_node)
+                current_node.set_parent(previous_node.get_parent())
+
+            previous_node = current_node
+            current_depth = depth
+
+        return AST(root)
+
+    def _create_node(self, data, depth):
+        """
+        Create a new node with the given data and depth.
+
+        Args:
+            data (str): The data for the node.
+            depth (int): The depth of the node.
+
+        Returns:
+            Node: The created node.
+        """
+        node = Node()
+        node.set_data(data)
+        node.set_depth(depth)
+        return node

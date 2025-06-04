@@ -100,7 +100,7 @@ def test_tuple_creation():
         assert child.node_type == NodeType.INTEGER
         assert child.value == str(i + 1)
 
-def test_conditional():
+def test_conditional1():
     ast = parse_code("x > 0 -> 'positive' | 'non-positive'")
     
     # Should be a conditional node
@@ -120,6 +120,7 @@ def test_conditional():
     false_branch = ast.children[2]
     assert false_branch.node_type == NodeType.STRING
     assert false_branch.value == "non-positive"
+
 
 def test_where_expression():
     ast = parse_code("x + y where x = 1 and y = 2")
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     test_simple_let_expression()
     test_function_definition()
     test_tuple_creation()
-    test_conditional()
+    test_conditional1()
     test_where_expression()
     test_parser_error()
     print("All parser tests passed!")

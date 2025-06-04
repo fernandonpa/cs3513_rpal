@@ -1,130 +1,37 @@
-from enum import Enum, auto
+from enum import Enum
 
 class TokenType(Enum):
-    """Enum defining all token types in RPAL language"""
-    # Keywords
-    LET = auto()
-    IN = auto()
-    FN = auto()
-    WHERE = auto()
-    AUG = auto()
-    OR = auto()
-    AND = auto()
-    NOT = auto()
-    GR = auto()
-    GE = auto()
-    LS = auto()
-    LE = auto()
-    EQ = auto()
-    NE = auto()
-    TRUE = auto()
-    FALSE = auto()
-    NIL = auto()
-    DUMMY = auto()
-    WITHIN = auto()
-    REC = auto()
+    """Enumeration of token types for RPAL lexical analysis.
     
-    # Literals
-    IDENTIFIER = auto()
-    INTEGER = auto()
-    STRING = auto()
+    This enum defines the different categories of tokens that can be identified
+    during the lexical analysis phase of the RPAL interpreter/compiler.
     
-    # Operators
-    PLUS = auto()
-    MINUS = auto()
-    MULTIPLY = auto()
-    DIVIDE = auto()
-    POWER = auto()
-    AT = auto()
-    AMPERSAND = auto()
-    ARROW = auto()
-    EQUALS = auto()
-    PIPE = auto()  # For the '|' operator
-    DOT = auto()
-    COLON = auto()
-    TILDE = auto()
-    DOLLAR = auto()
-    HASH = auto()
-    PERCENT = auto()
-    CARET = auto()
-    LEFT_BRACKET = auto()
-    RIGHT_BRACKET = auto()
-    LEFT_BRACE = auto()
-    RIGHT_BRACE = auto()
-    DOUBLE_QUOTE = auto()
-    QUESTION = auto()
+    Attributes:
+        KEYWORD (int): Reserved words in the RPAL language.
+        IDENTIFIER (int): Variable and function names.
+        INTEGER (int): Numeric literal values.
+        STRING (int): String literal values enclosed in quotes.
+        END_OF_TOKENS (int): Special marker indicating the end of input.
+        PUNCTUATION (int): Syntactic elements like parentheses, commas, etc.
+        OPERATOR (int): Mathematical or logical operation symbols.
+    """
+    # Language keywords (e.g., 'let', 'in', 'fn', etc.)
+    KEYWORD = 1
     
-    # Special symbols
-    LEFT_PAREN = auto()
-    RIGHT_PAREN = auto()
-    SEMICOLON = auto()
-    COMMA = auto()
+    # Identifiers represent variable names, function names, etc.
+    IDENTIFIER = 2
     
-    # End of file
-    EOF = auto()
+    # Integer numeric literals
+    INTEGER = 3
     
-    # For comment handling (not emitted as actual tokens)
-    COMMENT = auto()
-
-
-# Mapping of keywords to their token types (case insensitive)
-KEYWORDS = {
-    'let': TokenType.LET,
-    'in': TokenType.IN,
-    'fn': TokenType.FN,
-    'where': TokenType.WHERE,
-    'aug': TokenType.AUG,
-    'or': TokenType.OR,
-    'and': TokenType.AND,
-    'not': TokenType.NOT,
-    'gr': TokenType.GR,
-    'ge': TokenType.GE,
-    'ls': TokenType.LS,
-    'le': TokenType.LE,
-    'eq': TokenType.EQ,
-    'ne': TokenType.NE,
-    'true': TokenType.TRUE,
-    'false': TokenType.FALSE,
-    'nil': TokenType.NIL,
-    'dummy': TokenType.DUMMY,
-    'within': TokenType.WITHIN,
-    'rec': TokenType.REC
-}
-
-# Mapping of operators to their token types
-OPERATORS = {
-    '+': TokenType.PLUS,
-    '-': TokenType.MINUS,
-    '*': TokenType.MULTIPLY,
-    '/': TokenType.DIVIDE,
-    '**': TokenType.POWER,
-    '@': TokenType.AT,
-    '&': TokenType.AMPERSAND,
-    '->': TokenType.ARROW,
-    '=': TokenType.EQUALS,
-    '|': TokenType.PIPE,
-    '>': TokenType.GR,    # Add these three lines
-    '<': TokenType.LS,
-    '!': TokenType.NOT,
-    '.': TokenType.DOT,
-    ':': TokenType.COLON,
-    '~': TokenType.TILDE,
-    '$': TokenType.DOLLAR,
-    '#': TokenType.HASH,
-    '%': TokenType.PERCENT,
-    '^': TokenType.CARET,
-    '[': TokenType.LEFT_BRACKET,
-    ']': TokenType.RIGHT_BRACKET,
-    '{': TokenType.LEFT_BRACE,
-    '}': TokenType.RIGHT_BRACE,
-    '"': TokenType.DOUBLE_QUOTE,
-    '?': TokenType.QUESTION,
-}
-
-# Mapping of punctuation to their token types
-PUNCTUATION = {
-    '(': TokenType.LEFT_PAREN,
-    ')': TokenType.RIGHT_PAREN,
-    ';': TokenType.SEMICOLON,
-    ',': TokenType.COMMA
-}
+    # String literals (text enclosed in quotes)
+    STRING = 4
+    
+    # Special token type to mark the end of the token stream
+    END_OF_TOKENS = 5
+    
+    # Punctuation marks like parentheses, commas, semicolons, etc.
+    PUNCTUATION = 6
+    
+    # Operators like +, -, *, /, etc.
+    OPERATOR = 7
