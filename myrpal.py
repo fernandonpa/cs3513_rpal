@@ -23,6 +23,7 @@ def main():
     parser.add_argument('file_name', type=str, help='The RPAL program input file')
     parser.add_argument('-ast', action='store_true', help='Print the abstract syntax tree')
     parser.add_argument('-sast', action='store_true', help='Print the standardized abstract syntax tree')
+    parser.add_argument('-pretty', action='store_true', help='Format tuple output as a clean list')
 
     args = parser.parse_args()
 
@@ -68,7 +69,22 @@ def main():
 
         # Default action: execute the program and print its output
         print("Output of the above program is:")
-        print(cse_machine.get_answer())
+        result = cse_machine.get_answer()
+
+        if args.pretty and '(' in result:
+            # Extract all numbers from the tuple structure
+            import re
+            numbers = re.findall(r'\d+', result)
+            
+            # Convert to integers and sort in ascending order
+            numbers = [int(num) for num in numbers]
+            numbers.sort()  # Sort in ascending order
+            
+            # Convert back to strings for joining
+            numbers = [str(num) for num in numbers]
+            print(", ".join(numbers))
+        else:
+            print(result)
 
     except Exception as e:
         print(f"Error: {e}")
