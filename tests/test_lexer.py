@@ -92,9 +92,9 @@ class TestTokenizer:
         assert tokens[2].type == TokenType.STRING
     
     def test_operators(self):
-        tokenizer = Tokenizer("+ - * / -> = |")
+        tokenizer = Tokenizer("+ - * / -> = | > < !")
         tokens = tokenizer.tokenize()
-        assert len(tokens) == 8  # 7 operators + EOF
+        assert len(tokens) == 11  # 7 operators + EOF
         
         assert tokens[0].type == TokenType.PLUS
         assert tokens[0].value == "+"
@@ -116,6 +116,15 @@ class TestTokenizer:
         
         assert tokens[6].type == TokenType.PIPE
         assert tokens[6].value == "|"
+
+        assert tokens[7].type == TokenType.GR
+        assert tokens[7].value == ">"
+
+        assert tokens[8].type == TokenType.LS
+        assert tokens[8].value == "<"
+
+        assert tokens[9].type == TokenType.NOT
+        assert tokens[9].value == "!"
     
     def test_punctuation(self):
         tokenizer = Tokenizer("( ) ; ,")
@@ -169,7 +178,7 @@ class TestTokenizer:
             tokenizer.tokenize()
     
     def test_unexpected_character_error(self):
-        tokenizer = Tokenizer("let x = $")
+        tokenizer = Tokenizer("let x = `")
         with pytest.raises(UnexpectedCharacterError):
             tokenizer.tokenize()
     
