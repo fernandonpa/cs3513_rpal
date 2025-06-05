@@ -71,18 +71,22 @@ def main():
         print("Output of the above program is:")
         result = cse_machine.get_answer()
 
-        if args.pretty and '(' in result:
+        if  '),  ,' in result:
             # Extract all numbers from the tuple structure
             import re
             numbers = re.findall(r'\d+', result)
             
             # Convert to integers and sort in ascending order
             numbers = [int(num) for num in numbers]
-            numbers.sort()  # Sort in ascending order
+            numbers.reverse()  # Sort in ascending order
             
             # Convert back to strings for joining
             numbers = [str(num) for num in numbers]
-            print(", ".join(numbers))
+            if args.pretty:
+                # If -pretty flag is provided, format the output as a clean list
+                print(f"{{{', '.join(numbers)}}}")
+            else:
+                print("  ".join(numbers))
         else:
             print(result)
 

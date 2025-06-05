@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from src.tree_normalizer.syntax_node import Node as StdNode, NodeFactory
 from src.tree_normalizer.tree_builder import AST
 from src.cse_machine.machine import CSEMachine
-from src.cse_machine.factory import CSEFactory
+from cse_machine.nodes.factory import CSEFactory
 from src.cse_machine.nodes import *
 from src.cse_machine.error_handler import CSEMachineError
 
