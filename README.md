@@ -87,7 +87,7 @@ make ast file=examples/program.txt
 # Print the standardized abstract syntax tree
 make sast file=examples/program.txt
 
-# Format output in a pretty, sorted manner
+# Format output in a pretty, comma separated manner
 make pretty file=examples/program.txt
 
 # Clean build artifacts
