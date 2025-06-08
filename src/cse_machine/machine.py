@@ -1,4 +1,3 @@
-
 from .nodes.symbol import Symbol
 from .nodes.rand import Rand
 from .nodes.rator import Rator
@@ -58,7 +57,6 @@ class CSEMachine:
         j = 1  # Environment index counter for new environments
         
         while self.control:
-            
             current_symbol = self.control.pop()  # Get next node to process
             
             if isinstance(current_symbol, Id):
@@ -132,23 +130,27 @@ class CSEMachine:
                         pass
                         
                     elif next_symbol.get_data() == "Stem":
-                        # Get first character of string
+                        # Get first character of string - CREATE NEW OBJECT
                         s = self.stack.pop(0)
-                        s.set_data(s.get_data()[0])
-                        self.stack.insert(0, s)
+                        first_char = s.get_data()[0]
+                        new_str = Str(first_char)  # Create new object instead of modifying
+                        self.stack.insert(0, new_str)
                         
                     elif next_symbol.get_data() == "Stern":
-                        # Get all but first character of string
+                        # Get all but first character of string - CREATE NEW OBJECT
                         s = self.stack.pop(0)
-                        s.set_data(s.get_data()[1:])
-                        self.stack.insert(0, s)
+                        remaining = s.get_data()[1:]
+                        new_str = Str(remaining)  # Create new object instead of modifying
+                        self.stack.insert(0, new_str)
                         
                     elif next_symbol.get_data() == "Conc":
-                        # Concatenate two strings
+                        # Concatenate two strings - HANDLE EXTRA GAMMA
+                        self.control.pop()  # Remove the extra gamma for Conc
                         s1 = self.stack.pop(0)
                         s2 = self.stack.pop(0)
-                        s1.set_data(s1.get_data() + s2.get_data())
-                        self.stack.insert(0, s1)
+                        concatenated = s1.get_data() + s2.get_data()
+                        new_str = Str(concatenated)  # Create new object
+                        self.stack.insert(0, new_str)
                         
                     elif next_symbol.get_data() == "Order":
                         # Get tuple size
@@ -277,10 +279,7 @@ class CSEMachine:
         """
         with open(file_path, 'a') as file:
             for symbol in self.stack:
-                file.write(symbol.get_data())
-                if isinstance(symbol, (Lambda, Delta, E, Eta)):
-                    file.write(str(symbol.get_index()))
-                file.write(",")
+                file.write(f"{symbol.get_data()} ")
             file.write("\n")
 
     def write_control_to_file(self, file_path):
@@ -291,10 +290,7 @@ class CSEMachine:
         """
         with open(file_path, 'a') as file:
             for symbol in self.control:
-                file.write(symbol.get_data())
-                if isinstance(symbol, (Lambda, Delta, E, Eta)):
-                    file.write(str(symbol.get_index()))
-                file.write(",")
+                file.write(f"{symbol.get_data()} ")
             file.write("\n")
     
     @staticmethod
@@ -316,7 +312,7 @@ class CSEMachine:
             if symbol.get_index() != 0:
                 print(f"e{symbol.get_parent().get_index()}")
             else:
-                print()
+                print("NULL")
                 
     def covert_string_to_bool(self, data):
         """Convert a string boolean representation to a Python boolean.

@@ -24,13 +24,15 @@ def tokenize(input_str):
     tokens = []  # List to store the identified tokens
     
     # Dictionary mapping token types to their regex patterns
+    # Order matters - multi-character operators must come before single characters
     keywords = {
         'COMMENT': r'//.*',                     # Comments start with // and continue to end of line
         'KEYWORD': r'(let|in|fn|where|aug|or|not|gr|ge|ls|le|eq|ne|true|false|nil|dummy|within|and|rec)\b',  # RPAL reserved words
         'STRING': r'\'(?:\\\'|[^\'])*\'',       # String literals enclosed in single quotes
         'IDENTIFIER': r'[a-zA-Z][a-zA-Z0-9_]*', # Variables and function names
         'INTEGER': r'\d+',                      # Numeric literals
-        'OPERATOR': r'[+\-*<>&.@/:=~|$\#!%^_\[\]{}"\'?]+',  # Various operators
+        'MULTI_CHAR_OPERATOR': r'(\*\*|->|>=|<=)',  # Multi-character operators (handle these first!)
+        'OPERATOR': r'[+\-*<>&.@/:=~|$\#!%^_\[\]{}"\'?]',  # Single character operators
         'SPACES': r'[ \t\n]+',                  # Whitespace (ignored in output)
         'PUNCTUATION': r'[();,]'                # Punctuation marks
     }
@@ -53,7 +55,12 @@ def tokenize(input_str):
                         break
                     else:
                         # For all other token types, create a token
-                        token_type = getattr(TokenType, key)  # Get TokenType enum value
+                        # Handle multi-character operators as regular operators
+                        if key == 'MULTI_CHAR_OPERATOR':
+                            token_type = TokenType.OPERATOR
+                        else:
+                            token_type = getattr(TokenType, key)  # Get TokenType enum value
+                            
                         if not isinstance(token_type, TokenType):
                             raise ValueError(f"Token type '{key}' is not a valid TokenType")
                             
