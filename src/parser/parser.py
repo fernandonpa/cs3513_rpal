@@ -1,5 +1,5 @@
 from enum import Enum
-from ..Lexer.lexer import TokenType, MyToken
+from ..lexer.lexer import TokenType, MyToken
 from .node_types import NodeType
 from .ast_node import Node
 
