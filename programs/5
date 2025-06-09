@@ -1,0 +1,7 @@
+let OESeries T = OESeriesRec T 1
+where rec OESeriesRec T i= 
+    i > Order T -> nil |
+    (OESeriesRec T (i+1) , print ' ' , print (OddEven (T i)))
+ 
+where OddEven n = (n - (n/2)*2) eq 0 -> 'Even'|'Odd'
+in OESeries (4,8,6,7)

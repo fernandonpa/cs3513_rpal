@@ -1,0 +1,17 @@
+let rec palSeries a b =
+    a > b -> nil
+| isPal a -> (palSeries (a+1)b,print ' ' , print a)
+             |palSeries (a+1)b
+
+where isPal num = num eq (getReverse num) -> true|false
+where getReverse n = getReverseRec n 0
+where rec getReverseRec n r = n eq 0 -> r | 
+    getReverseRec (n/10)(r*10 + (n-(n/10)*10))
+in (palSeries 4 16)
+
+
+// let isPal num = num eq (getReverse num) -> 'Palindrome'|'Not palindrome'
+// where getReverse n = getReverseRec n 0
+// where rec getReverseRec n r = n eq 0 -> r | 
+//     getReverseRec (n/10)(r*10 + (n-(n/10)*10))
+// in print (isPal 456)

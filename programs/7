@@ -1,0 +1,8 @@
+let rec fibSeries a b = 
+    a > b -> nil |
+    (fibSeries(a+1)b,print ' ' ,print(fib a))
+where rec fib n = 
+n eq 0 -> |
+n eq 1 -> |
+fib (n-1) + fib (n-2)
+in fibSeries 9 12

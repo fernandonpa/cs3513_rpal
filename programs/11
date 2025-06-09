@@ -1,0 +1,6 @@
+let OEList T = OEListRec (T , Order T)
+where rec OEListRec (T,i) = 
+    i eq 0 -> nil
+    | (OEListRec (T , (i-1)) aug (OddEven ( T i)))
+where OddEven n = (n - (n/2)*2) eq 1 -> 'Odd'|'Even'
+in print(OEList(1,5,4,6))

@@ -1,0 +1,7 @@
+let vectorSum (A,B) = (Order A) eq (Order B) ->
+    vectorSumRec (A,B,Order A)
+    |'Error'
+    where rec vectorSumRec (A,B,i) = 
+        i eq 0 -> nil
+        |(vectorSumRec (A,B,(i-1)) aug (A i + B i))
+in print(vectorSum((1,3,5),(5,4,6)))

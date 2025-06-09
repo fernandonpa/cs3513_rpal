@@ -1,0 +1,10 @@
+let rec GenerateFibonacciSeries(lower, upper, current, previous) = 
+    (current + previous) ls lower -> GenerateFibonacciSeries(lower, upper, current + previous, current) |
+    (current + previous) ls upper -> ((GenerateFibonacciSeries(lower, upper, current + previous, current)), print(' '), print(current + previous)) | nil
+in
+let PrintFibonacciRange(start, end) = 
+    start le 1 ->
+        (GenerateFibonacciSeries(start, end, 1, 0), print(' '), print(1), print(' '), print(0)) |
+        GenerateFibonacciSeries(start, end, 1, 0)			
+in
+PrintFibonacciRange(3, 41)

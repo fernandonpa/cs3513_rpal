@@ -117,7 +117,7 @@ def main():
             def execute_program():
                 return cse_machine.get_answer()
             
-            result = run_with_timeout(execute_program, timeout_seconds=2)
+            result = run_with_timeout(execute_program, timeout_seconds=1.5)
             
             if result and '),  ,' in result:
                 import re

@@ -1,0 +1,5 @@
+let getListSum T = getListSumRec T 1 0
+where rec getListSumRec T i s=  
+    i > Order T -> s
+    | getListSumRec T (i+1)(s + (T i))
+in print (getListSum (1,5))
