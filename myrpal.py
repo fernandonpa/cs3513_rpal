@@ -1,11 +1,11 @@
 import threading
 import time
 import argparse
-from src.Parser.parser import Parser
+from src.parser.parser import Parser
 from src.tree_normalizer.tree_factory import ASTFactory
 from src.cse_machine.machine import CSEMachine
 from src.cse_machine.factory import CSEMachineFactory
-from src.Lexer.lexer import tokenize
+from src.lexer.lexer import tokenize
 
 class TimeoutException(Exception):
     pass
@@ -117,7 +117,7 @@ def main():
             def execute_program():
                 return cse_machine.get_answer()
             
-            result = run_with_timeout(execute_program, timeout_seconds=2)
+            result = run_with_timeout(execute_program, timeout_seconds=1.5)
             
             if result and '),  ,' in result:
                 import re

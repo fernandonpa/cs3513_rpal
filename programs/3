@@ -1,0 +1,7 @@
+let findMax a b c = 
+(Isinteger a) & (Isinteger b) & (Isinteger c) ->
+    a > b ->
+        a > c -> a | c
+    | c > b -> c | b
+| 'Invalid number'
+in print(findMax 5 6 4)

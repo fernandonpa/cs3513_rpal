@@ -1,0 +1,5 @@
+let isPerfectSqr n = isPerfectSqrRec n 1
+where rec isPerfectSqrRec n i= n < i*i -> 'not perfect sqr'
+    | n eq i*i -> 'perfect sql'
+    | isPerfectSqrRec n (i+1)
+in print (isPerfectSqr 64)

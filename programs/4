@@ -1,0 +1,11 @@
+let rec sumUpToSeries a b = a > b -> nil |
+ (sumUpToSeries (a+1)b , print ' ' , print (sumUpTo a))
+
+ where rec sumUpTo n = n eq 0 -> 0
+ | n + sumUpTo(n-1)
+ in sumUpToSeries 2 4
+
+
+//  let rec sumUpTo n = n eq 0 -> 0
+// | n + sumUpTo(n-1)
+// in print(sumUpTo 4998)

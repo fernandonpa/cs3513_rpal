@@ -1,0 +1,7 @@
+let tuple_reverse t =
+not Istuple t -> 'error'
+| tr t (Order t) 1 where
+rec tr t n i =
+i > n -> nil
+| (tr t n (i+1) aug (t i))
+in Print ( tuple_reverse (1,2,3) )

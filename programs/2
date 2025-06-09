@@ -1,0 +1,8 @@
+let getGrade marks = 
+    not (Isinteger marks) -> 'Please enter an integer'
+    |(marks > 100) or (marks < 0) -> 'Invalid marks'
+    | marks >= 75 -> 'A'
+    | marks >= 65 -> 'B'
+    | marks >= 50 -> 'C'
+    | 'F'
+in print(getGrade 'a')

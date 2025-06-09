@@ -1,0 +1,16 @@
+// let OddEven n = (n - (n/2)*2) eq 0 -> 'Even'|'Odd'
+// in print(OddEven (-4))
+
+// let rec OddEvenRec n = 
+//     n eq 0 -> 'Even' |
+//     n eq 1 -> 'Odd' |
+//     OddEvenRec(n-2) 
+// in print(OddEvenRec(8))
+
+let OddEven n = (n - (n/2)*2) eq 0 -> 'Even'|'Odd' 
+    and
+    rec OddEvenRec n = 
+        n eq 0 -> 'Even' |
+        n eq 1 -> 'Odd' |
+        OddEvenRec(n-2)  
+in print(OddEven(7), OddEvenRec(8)) 
