@@ -173,7 +173,7 @@ class Parser:
            -> T
         """
         self.T()  # Parse tuple expression
-        if self.tokens[0].value == "where":
+        if self.tokens and self.tokens[0].value == "where":
             # Handle where expression
             self.tokens.pop(0)  # Remove "where"
             self.Da()  # Parse definitions
@@ -188,7 +188,7 @@ class Parser:
         """
         self.Ta()  # Parse first element
         n = 1  # Count tuple elements
-        while self.tokens[0].value == ",":
+        while self.tokens and self.tokens[0].value == ",":
             self.tokens.pop(0)  # Remove comma
             self.Ta()  # Parse next element
             n += 1
@@ -207,7 +207,7 @@ class Parser:
            -> Tc
         """
         self.Tc()  # Parse conditional expression
-        while self.tokens[0].value == "aug":
+        while self.tokens and self.tokens[0].value == "aug":
             self.tokens.pop(0)  # Remove "aug"
             self.Tc()  # Parse next part
             self.ast.append(Node(NodeType.aug, "aug", 2))  # Create aug node
@@ -220,12 +220,13 @@ class Parser:
            -> B
         """
         self.B()  # Parse boolean expression
-        if self.tokens[0].value == "->":
+        if self.tokens and self.tokens[0].value == "->":
             # Handle conditional expression (if-then-else)
             self.tokens.pop(0)  # Remove '->'
             self.Tc()  # Parse 'then' branch
-            if self.tokens[0].value != "|":
+            if not self.tokens or self.tokens[0].value != "|":
                 print("Parse error at Tc: conditional '|' expected")
+                return
             self.tokens.pop(0)  # Remove '|'
             self.Tc()  # Parse 'else' branch
             # Create conditional node with 3 children (condition, then, else)
@@ -242,7 +243,7 @@ class Parser:
           -> Bt
         """
         self.Bt()  # Parse boolean term
-        while self.tokens[0].value == "or":
+        while self.tokens and self.tokens[0].value == "or":
             self.tokens.pop(0)  # Remove 'or'
             self.Bt()  # Parse next term
             self.ast.append(Node(NodeType.op_or, "or", 2))  # Create or node
@@ -258,7 +259,7 @@ class Parser:
            -> Bs
         """
         self.Bs()  # Parse boolean simple expression
-        while self.tokens[0].value == "&":
+        while self.tokens and self.tokens[0].value == "&":
             self.tokens.pop(0)  # Remove '&'
             self.Bs()  # Parse next simple expression
             self.ast.append(Node(NodeType.op_and, "&", 2))  # Create and node
@@ -270,7 +271,7 @@ class Parser:
         Bs -> 'not' Bp => 'not'
            -> Bp
         """
-        if self.tokens[0].value == "not":
+        if self.tokens and self.tokens[0].value == "not":
             # Handle not expression
             self.tokens.pop(0)  # Remove 'not'
             self.Bp()  # Parse boolean primary
@@ -291,23 +292,24 @@ class Parser:
            -> A
         """
         self.A()  # Parse arithmetic expression
-        token = self.tokens[0]
-        # Check for comparison operators
-        if token.value in [">", ">=", "<", "<=", "gr", "ge", "ls", "le", "eq", "ne"]:
-            self.tokens.pop(0)  # Remove operator
-            self.A()  # Parse right-hand side
-            
-            # Create appropriate comparison node
-            if token.value == ">":
-                self.ast.append(Node(NodeType.op_compare, "gr", 2))
-            elif token.value == ">=":
-                self.ast.append(Node(NodeType.op_compare, "ge", 2))
-            elif token.value == "<":
-                self.ast.append(Node(NodeType.op_compare, "ls", 2))
-            elif token.value == "<=":
-                self.ast.append(Node(NodeType.op_compare, "le", 2))
-            else:
-                self.ast.append(Node(NodeType.op_compare, token.value, 2))
+        if self.tokens:
+            token = self.tokens[0]
+            # Check for comparison operators
+            if token.value in [">", ">=", "<", "<=", "gr", "ge", "ls", "le", "eq", "ne"]:
+                self.tokens.pop(0)  # Remove operator
+                self.A()  # Parse right-hand side
+                
+                # Create appropriate comparison node
+                if token.value == ">":
+                    self.ast.append(Node(NodeType.op_compare, "gr", 2))
+                elif token.value == ">=":
+                    self.ast.append(Node(NodeType.op_compare, "ge", 2))
+                elif token.value == "<":
+                    self.ast.append(Node(NodeType.op_compare, "ls", 2))
+                elif token.value == "<=":
+                    self.ast.append(Node(NodeType.op_compare, "le", 2))
+                else:
+                    self.ast.append(Node(NodeType.op_compare, token.value, 2))
 
     def A(self):
         """Parse an arithmetic expression with +/- (A).
@@ -320,10 +322,10 @@ class Parser:
           -> At
         """
         # Handle unary operators
-        if self.tokens[0].value == "+":
+        if self.tokens and self.tokens[0].value == "+":
             self.tokens.pop(0)  # Remove unary plus (no effect)
             self.At()
-        elif self.tokens[0].value == "-":
+        elif self.tokens and self.tokens[0].value == "-":
             self.tokens.pop(0)  # Remove unary minus
             self.At()
             self.ast.append(Node(NodeType.op_neg, "neg", 1))  # Create negation node
@@ -331,7 +333,7 @@ class Parser:
             self.At()  # Parse arithmetic term
 
         # Handle binary +/- operators (left-associative)
-        while self.tokens[0].value in {"+", "-"}:
+        while self.tokens and self.tokens[0].value in {"+", "-"}:
             current_token = self.tokens[0]  # Save operator
             self.tokens.pop(0)  # Remove operator
             self.At()  # Parse next term
@@ -356,7 +358,7 @@ class Parser:
         self.Af()  # Parse arithmetic factor
         
         # Handle multiplication and division (left-associative)
-        while self.tokens[0].value in {"*", "/"}:
+        while self.tokens and self.tokens[0].value in {"*", "/"}:
             current_token = self.tokens[0]  # Save operator
             self.tokens.pop(0)  # Remove operator
             self.Af()  # Parse next factor
@@ -380,7 +382,7 @@ class Parser:
         self.Ap()  # Parse arithmetic primary
         
         # Handle exponentiation (right-associative)
-        if self.tokens[0].value == "**":
+        if self.tokens and self.tokens[0].value == "**":
             self.tokens.pop(0)  # Remove power operator
             self.Af()  # Parse exponent (recursive for right-associativity)
             self.ast.append(Node(NodeType.op_pow, "**", 2))  # Create power node
@@ -398,10 +400,10 @@ class Parser:
         self.R()  # Parse rator/rand
         
         # Handle pattern matching expressions
-        while self.tokens[0].value == "@":
+        while self.tokens and self.tokens[0].value == "@":
             self.tokens.pop(0)  # Remove @ operator
             
-            if self.tokens[0].type != TokenType.IDENTIFIER:
+            if not self.tokens or self.tokens[0].type != TokenType.IDENTIFIER:
                 print("Parsing error at Ap: IDENTIFIER EXPECTED")
                 return
             
@@ -428,9 +430,10 @@ class Parser:
         self.Rn()  # Parse first rand
         
         # Handle function application (left-associative)
-        while (self.tokens[0].type in [TokenType.IDENTIFIER, TokenType.INTEGER, TokenType.STRING] or
-               self.tokens[0].value in ["true", "false", "nil", "dummy"] or
-               self.tokens[0].value == "("):
+        while (self.tokens and 
+               (self.tokens[0].type in [TokenType.IDENTIFIER, TokenType.INTEGER, TokenType.STRING] or
+                self.tokens[0].value in ["true", "false", "nil", "dummy"] or
+                self.tokens[0].value == "(")):
             
             self.Rn()  # Parse argument
             # Create gamma node (function application) with 2 children (function, arg)
@@ -503,7 +506,7 @@ class Parser:
           -> Da
         """
         self.Da()  # Parse definition and
-        if self.tokens[0].value == "within":
+        if self.tokens and self.tokens[0].value == "within":
             # Handle within expression
             self.tokens.pop(0)  # Remove 'within'
             self.D()  # Parse inner definition
@@ -518,7 +521,7 @@ class Parser:
         """
         self.Dr()  # Parse definition rec
         n = 1  # Count definitions
-        while self.tokens[0].value == "and":
+        while self.tokens and self.tokens[0].value == "and":
             self.tokens.pop(0)  # Remove 'and'
             self.Dr()  # Parse next definition
             n += 1
@@ -534,7 +537,7 @@ class Parser:
           -> Db
         """
         is_rec = False
-        if self.tokens[0].value == "rec":
+        if self.tokens and self.tokens[0].value == "rec":
             # Check for recursive definition
             self.tokens.pop(0)  # Remove 'rec'
             is_rec = True
@@ -559,37 +562,80 @@ class Parser:
                 print("Parsing error at Db #1")
             self.tokens.pop(0)  # Remove ')'
         elif self.tokens[0].type == TokenType.IDENTIFIER:
-            if self.tokens[1].value == "(" or self.tokens[1].type == TokenType.IDENTIFIER:
-                # Handle function definition (fcn_form)
+            # Look ahead to determine if this is a function definition
+            # We need to check if there are parameters before the '=' sign
+            
+            i = 1
+            param_count = 0
+            
+            # Count consecutive identifiers (parameters) before '='
+            while (i < len(self.tokens) and 
+                   (self.tokens[i].type == TokenType.IDENTIFIER or 
+                    (self.tokens[i].type == TokenType.PUNCTUATION and self.tokens[i].value == "("))):
+                if self.tokens[i].type == TokenType.IDENTIFIER:
+                    param_count += 1
+                    i += 1
+                elif self.tokens[i].value == "(":
+                    # Skip balanced parentheses for grouped parameters
+                    paren_count = 1
+                    i += 1
+                    while i < len(self.tokens) and paren_count > 0:
+                        if self.tokens[i].value == "(":
+                            paren_count += 1
+                        elif self.tokens[i].value == ")":
+                            paren_count -= 1
+                        i += 1
+                    param_count += 1
+            
+            # Check if we found an '=' after the parameters
+            has_equals = i < len(self.tokens) and self.tokens[i].value == "="
+            
+            if param_count > 0 and has_equals:
+                # This is a function definition (fcn_form)
                 self.ast.append(Node(NodeType.identifier, self.tokens[0].value, 0))
                 self.tokens.pop(0)  # Remove function name
 
-                n = 1  # Count parameters (1 for function name)
-                while self.tokens[0].type == TokenType.IDENTIFIER or self.tokens[0].value == "(":
+                n = 1  # Count children (1 for function name)
+                
+                # Parse all parameters
+                while (self.tokens and 
+                       (self.tokens[0].type == TokenType.IDENTIFIER or 
+                        (self.tokens[0].type == TokenType.PUNCTUATION and self.tokens[0].value == "("))):
                     self.Vb()  # Parse parameter
                     n += 1
-                if self.tokens[0].value != "=":
-                    print("Parsing error at Db #2")
+                
+                if not self.tokens or self.tokens[0].value != "=":
+                    print("Parsing error at Db #2: Expected '=' in function definition")
+                    return
+                    
                 self.tokens.pop(0)  # Remove '='
                 self.E()  # Parse function body
+                n += 1  # Add one for the body
 
-                # Create fcn_form node with n+1 children (name, parameters, body)
-                self.ast.append(Node(NodeType.fcn_form, "fcn_form", n+1))
-            elif self.tokens[1].value == "=":
-                # Handle simple variable definition
+                # Create fcn_form node
+                self.ast.append(Node(NodeType.fcn_form, "fcn_form", n))
+                
+            elif len(self.tokens) > 1 and self.tokens[1].value == "=":
+                # Handle simple variable definition (no parameters)
                 self.ast.append(Node(NodeType.identifier, self.tokens[0].value, 0))
                 self.tokens.pop(0)  # Remove identifier
-                self.tokens.pop(0)  # Remove equal
-                self.E()  # Parse expression
-                self.ast.append(Node(NodeType.equal, "=", 2))  # Create equals node
-            elif self.tokens[1].value == ",":
-                # Handle multi-variable definition
-                self.Vl()  # Parse variable list
-                if self.tokens[0].value != "=":
-                    print("Parsing error at Db")
                 self.tokens.pop(0)  # Remove '='
                 self.E()  # Parse expression
                 self.ast.append(Node(NodeType.equal, "=", 2))  # Create equals node
+                
+            elif len(self.tokens) > 1 and self.tokens[1].value == ",":
+                # Handle multi-variable definition
+                self.Vl()  # Parse variable list
+                if not self.tokens or self.tokens[0].value != "=":
+                    print("Parsing error at Db: Expected '=' after variable list")
+                    return
+                self.tokens.pop(0)  # Remove '='
+                self.E()  # Parse expression
+                self.ast.append(Node(NodeType.equal, "=", 2))  # Create equals node
+            else:
+                print(f"Parsing error at Db: Unexpected token pattern. Token 1: {self.tokens[0].value}, Token 2: {self.tokens[1].value if len(self.tokens) > 1 else 'EOF'}")
+        else:
+            print(f"Parsing error at Db: Expected identifier or '(', got {self.tokens[0].type} with value '{self.tokens[0].value}'")
 
     def Vb(self):
         """Parse a variable binding (Vb).
@@ -630,16 +676,20 @@ class Parser:
         n = 0  # Count identifiers
         while True:
             if n > 0:
+                if not self.tokens or self.tokens[0].value != ",":
+                    break
                 self.tokens.pop(0)  # Remove comma
-            if not self.tokens[0].type == TokenType.IDENTIFIER:
-                print("Parse error: an identifier was expected")
+            if not self.tokens or self.tokens[0].type != TokenType.IDENTIFIER:
+                if n == 0:  # If we haven't found any identifiers yet
+                    print("Parse error: an identifier was expected")
+                break
             
             # Add identifier node
             self.ast.append(Node(NodeType.identifier, self.tokens[0].value, 0))
             self.tokens.pop(0)  # Remove identifier
             n += 1
             
-            if not self.tokens[0].value == ",":
+            if not self.tokens or self.tokens[0].value != ",":
                 break  # No more identifiers
         
         if n > 1:

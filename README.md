@@ -117,19 +117,28 @@ If you're using Windows, you can use WSL for a Linux-like experience:
 cs3513_rpal/
 ├── src/
 │   ├── Lexer/                         # Tokenizer implementation
+│   │   ├── __init__.py
 │   │   ├── lexer.py                   # Main lexer logic
 │   │   ├── token.py                   # Token class definition
+│   │   ├── token_error.py
 │   │   └── token_types.py             # Token type definitions
 │   ├── Parser/                        # Recursive-descent parser
+│   │   ├── __init__.py
 │   │   ├── ast_node.py                # AST node implementation
 │   │   ├── node_types.py              # Node type definitions
+│   │   ├── parser_error.py
 │   │   └── parser.py                  # Parser implementation
 │   ├── tree_normalizer/               # AST → Standardized Tree (ST)
+│   │   ├── __init__.py
 │   │   ├── normalizer.py              # Tree standardization logic
 │   │   ├── syntax_node.py             # Syntax node definitions
+│   │   ├── normalizer_error.py
+│   │   ├── tree_builder.py
 │   │   └── tree_factory.py            # Factory for tree creation
 │   ├── cse_machine/                   # CSE abstract machine evaluator
+│   │   ├── __init__.py
 │   │   ├── factory.py                 # Factory for CSE machine creation
+│   │   ├── error_handler.py
 │   │   ├── machine.py                 # CSE machine implementation
 │   │   └── nodes/                     # Node types for CSE machine
 ├── examples/                          # Sample RPAL programs
